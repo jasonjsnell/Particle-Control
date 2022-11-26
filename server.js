@@ -25,21 +25,16 @@ io.on('connection', (socket) => {
     console.log("new socket id", socket.id, "total numer", io.engine.clientsCount);
 
 
-    //listen for data coming in 
-    // socket.on('mouseDrawData', (data) => {
-       
-    //     //then send it back out
-    //     console.log("mouse draw data", data.x, data.y);
-        
-    //     //send to everyone, including us by targetting global object
-    //     io.emit('mouseDrawData', data);
+    //listen for data coming in...
+    socket.on('changeFreqSlider', (data) => {
+        //send to everyone EXCEPT this client
+        socket.broadcast.emit('changeFreqSlider', data);
+    });
 
-    //     //send to everyone EXCEPT this client
-    //     //socket.broadcast.emit('mouseDrawData', data);
-
-    //     //send to us only
-    //     //socket.emit('mouseDrawData', data);
-    // });
+    socket.on('changeAmpSlider', (data) => {
+        //send to everyone EXCEPT this client
+        socket.broadcast.emit('changeAmpSlider', data);
+    });
 
     socket.on('disconnect', () => {
         console.log("socket disconected", socket.id);
