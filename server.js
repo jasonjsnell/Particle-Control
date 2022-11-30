@@ -22,8 +22,7 @@ io = new io.Server(server); //redefine same var as IO server
 //same as io.sockets.on
 io.on('connection', (socket) => {
     
-    console.log("new socket id", socket.id, "total numer", io.engine.clientsCount);
-
+    console.log("new socket id", socket.id, "total num", io.engine.clientsCount);
 
     //listen for data coming in...
     socket.on('changeFreqSlider', (data) => {
