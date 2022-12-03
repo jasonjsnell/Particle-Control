@@ -24,17 +24,6 @@ io.on('connection', (socket) => {
     
     console.log("new socket id", socket.id, "total num", io.engine.clientsCount);
 
-    //listen for data coming in...
-    socket.on('changeFreqSlider', (data) => {
-        //send to everyone EXCEPT this client
-        socket.broadcast.emit('changeFreqSlider', data);
-    });
-
-    socket.on('changeAmpSlider', (data) => {
-        //send to everyone EXCEPT this client
-        socket.broadcast.emit('changeAmpSlider', data);
-    });
-
     socket.on('disconnect', () => {
         console.log("socket disconected", socket.id);
     })
