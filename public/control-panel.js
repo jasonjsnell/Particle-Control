@@ -1,8 +1,10 @@
 let ssp;
 
+//placeholders for incoming values from visualizer
+let batteryLevel = 0;
+let accel;
+
 //sliders to control EEG params
-const SLIDER_FREQ_ID = "SLIDER_FREQ";
-const SLIDER_AMP_ID = "SLIDER_AMP";
 let freqSlider;
 let ampSlider;
 
@@ -28,9 +30,9 @@ function setup() {
   //setupMuse();
   
   // Passing in "DATA" as the capture type but data sharing works with "CAPTURE" and "CANVAS" as well
-  p5lm = new p5LiveMedia(this, "DATA", null, "particle-control");
+  p5lm = new p5LiveMedia(this, "DATA", null, LIVE_MEDIA_ID);
   // "data" callback
-  p5lm.on('data', receivedData);
+  p5lm.on('data', didReceiveRtcData);
 }
 
 function draw() {
@@ -103,7 +105,7 @@ function draw() {
   fill(0);
   
   textSize(10);
-  // text('BATTERY: ' + batteryLevel, width-80, 10);
+  text('BATTERY: ' + batteryLevel, width-80, 10);
 
   // textSize(12);
   // text('DELTA: ' + eeg.delta, 10, 30);
@@ -119,30 +121,19 @@ function draw() {
   
 }
 
-function receivedData(data, id) {
+function didReceiveRtcData(data, id) {
 
-  print(id + ":" + data);
-  
   // If it is JSON, parse it
-  let d = JSON.parse(data);
+  let jsonData = JSON.parse(data);
 
-  console.log("received data", data, id)
-  
-  if (d.type == "SLIDER_AMP") {
-    console.log("change amp slider to", d.amp);
-  } else if (d.type == "SLIDER_FREQ") {
-    console.log("change freq slider to", d.freq);
+  console.log("received data", jsonData, id)
+
+  if (jsonData.type == BATTERY_ID) {
+    batteryLevel = jsonData.batteryLevel + "%"
   }
+  if (jsonData.type == ACCEL_ID) {
+    accel = jsonData.accel
+    console.log("RX accel", accel);
+  }
+
 }
-
-
-
-// //WEBRTC
-// function mouseMoved() {
-//   console.log("mousemoved")
-//   // Package as JSON to send
-//   let dataToSend = {x: mouseX, y: mouseY};
-  
-//   // Send it
-//   p5lm.send(JSON.stringify(dataToSend));
-// }

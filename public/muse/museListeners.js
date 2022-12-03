@@ -8,6 +8,8 @@ function didReceiveEegLeftEar(data) {
 
 function didReceiveEegLeftForehead(data) {
     processEEG(1, data);
+    //this is the last of the four sensors to send an update
+    didUpdateEeg();
 }
 
 function didReceiveEegRightEar(data) {
@@ -20,6 +22,7 @@ function didReceiveEegRightForehead(data) {
 
 function didReceivePpg(data) {
     processPPG(data); 
+    didUpdatePpg(); //let sketch know this data has been updated
 }
 
 function didReceiveAccel(data) {
@@ -31,6 +34,9 @@ function didReceiveAccel(data) {
     accel.x = (_samples[0].x + _samples[1].x + _samples[2].x) / 3;
     accel.y = (_samples[0].y + _samples[1].y + _samples[2].y) / 3;
     accel.z = (_samples[0].z + _samples[1].z + _samples[2].z) / 3;
+    
+    //let sketch know this data has been updated
+    didUpdateAccel();
     //console.log("Accel:", accel);
 }
 
@@ -47,6 +53,11 @@ function didReceiveGyro(data) {
 }
 
 function didReceiveBattery(data) {
-    batteryLevel = data.getUint16(2) / 512;
-    console.log("Battery level:", batteryLevel, "%");
+    if (data){
+        batteryLevel = Math.round(data.getUint16(2) / 512);
+    }
+
+    //let sketch know this data has been updated
+    didUpdateBatteryLevel();
+    //console.log("Battery level:", batteryLevel, "%");
 }
