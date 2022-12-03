@@ -1,8 +1,8 @@
 let ssp;
 
-//sliders to control EEG params
-let freqSlider;
-let ampSlider;
+//EEG control vars from control panel
+const SLIDER_FREQ_ID = "SLIDER_FREQ";
+const SLIDER_AMP_ID = "SLIDER_AMP";
 
 let selectedFrequency;
 let selectedAmplitude;
@@ -14,20 +14,13 @@ function setup() {
   createCanvas(400, 400);
 
   selectedFrequency = 10;
-  freqSlider = createSlider(1, 60, selectedFrequency);
-  freqSlider.position(20, height-50);
-  freqSlider.style('width', (width*0.3) + 'px');
-
   selectedAmplitude = 10;
-  ampSlider = createSlider(0, 60, selectedAmplitude);
-  ampSlider.position(width * 0.5, height-50);
-  ampSlider.style('width', (width*0.3) + 'px');
+  
 
   //setupMuse();
   
   // Passing in "DATA" as the capture type but data sharing works with "CAPTURE" and "CANVAS" as well
-  p5lm = new p5LiveMedia(this, "DATA", null, "w83C-S6DU");
-  // "data" callback
+  p5lm = new p5LiveMedia(this, "DATA", null, "particle-control");
   p5lm.on('data', receivedData);
 }
 
@@ -54,33 +47,6 @@ function draw() {
   // noStroke();
   // fill(circleColor);
   // circle(width/2, height/2, circleSize);
-
-  //if values are new...
-  if (selectedFrequency != freqSlider.value()) {
-    selectedFrequency = freqSlider.value();
-    
-    //emit data to server, using custom data event name
-    let freqData = { 
-      type: "SLIDER_FREQ",
-      freq: selectedFrequency,
-    }
-    //send data with type to other peer
-    p5lm.send(JSON.stringify(freqData));
-  }
-
-  if (selectedAmplitude != ampSlider.value()) {
-    selectedAmplitude = ampSlider.value();
-    
-    //send data with type to other peer
-    let ampData = { 
-      type: "AMP_SLIDER",
-      amp: selectedAmplitude 
-    }
-
-    // Send it
-    console.log("try to send amp data", ampData)
-    p5lm.send(JSON.stringify(ampData));
-  }
 
   // EEG chart
   // beginShape();
@@ -120,14 +86,14 @@ function receivedData(data, id) {
   print(id + ":" + data);
   
   // If it is JSON, parse it
-  let d = JSON.parse(data);
+  let jsonData = JSON.parse(data);
 
   console.log("received data", data, id)
   
-  if (d.type == "SLIDER_AMP") {
-    console.log("change amp slider to", d.amp);
-  } else if (d.type == "SLIDER_FREQ") {
-    console.log("change freq slider to", d.freq);
+  if (jsonData.type == SLIDER_AMP_ID) {
+    selectedAmplitude = jsonData.amp
+  } else if (jsonData.type == SLIDER_FREQ_ID) {
+    selectedFrequency = jsonData.freq
   }
 }
 
