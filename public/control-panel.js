@@ -121,7 +121,15 @@ function draw() {
   text('BETA:  ' + eeg.beta,  10, 75);
   text('GAMMA: ' + eeg.gamma, 10, 90);
 
-  text('ACCEL: ' + Math.round(accel.x) + "  " + Math.round(accel.y) + "  " + Math.round(accel.z), 10, 130);
+  if (ppg.heartbeat) {
+    text("HEART bpm: " + ppg.bpm + " •", 10, 120);
+  } else {
+    text("HEART bpm: " + ppg.bpm, 10, 120);
+  }
+
+  text('ACCEL: ' + Math.round(accel.x) + "  " + Math.round(accel.y) + "  " + Math.round(accel.z), 10, 150);
+
+  text('ACCEL: ' +  10, 130);
   
   textSize(12);
   text('Target frequency: ' + selectedFrequency + ' Hz', 25, height-18);
