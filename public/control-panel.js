@@ -2,7 +2,16 @@ let ssp;
 
 //placeholders for incoming values from visualizer
 let batteryLevel = 0;
-let accel;
+let accel = {
+  x:0, y:0, z:0
+};
+let ppg = {
+  bpm: 0, heartbeat:false, amplitude: 0
+}
+
+let eeg = {
+  delta: 0, theta: 0, alpha: 0, beta: 0, gamma: 0, spectrum: []
+}
 
 //sliders to control EEG params
 let freqSlider;
@@ -70,7 +79,6 @@ function draw() {
     }
     
     //send data with type to other peer
-    console.log("try to send freq data", freqData)
     p5lm.send(JSON.stringify(freqData));
   }
 
@@ -84,22 +92,21 @@ function draw() {
     }
 
     // Send it
-    console.log("try to send amp data", ampData)
     p5lm.send(JSON.stringify(ampData));
   }
 
-  // EEG chart
-  // beginShape();
-  // strokeWeight(1);
-  // noFill();
-  // stroke(255, 255, 255);
+  //EEG chart
+  beginShape();
+  strokeWeight(1);
+  noFill();
+  stroke(255, 255, 255);
 
-  // for (let i = 1; i <= (eegSpectrum.length/2); i++) {
-  //  let x = map(i, 1, eegSpectrum.length/2, 0, width);
-  //  let y = map(eegSpectrum[i], 0, 50, height, 0);
-  //  vertex(x, y); //<-- draw a line graph
-  // }
-  // endShape();
+  for (let i = 1; i <= (eeg.spectrum.length/2); i++) {
+   let x = map(i, 1, eeg.spectrum.length/2, 0, width);
+   let y = map(eeg.spectrum[i], 0, 50, height, 0);
+   vertex(x, y); //<-- draw a line graph
+  }
+  endShape();
 
   noStroke();
   fill(0);
@@ -107,12 +114,14 @@ function draw() {
   textSize(10);
   text('BATTERY: ' + batteryLevel, width-80, 10);
 
-  // textSize(12);
-  // text('DELTA: ' + eeg.delta, 10, 30);
-  // text('THETA: ' + eeg.theta, 10, 45);
-  // text('ALPHA: ' + eeg.alpha, 10, 60);
-  // text('BETA:  ' + eeg.beta,  10, 75);
-  // text('GAMMA: ' + eeg.gamma, 10, 90);
+  textSize(12);
+  text('DELTA: ' + eeg.delta, 10, 30);
+  text('THETA: ' + eeg.theta, 10, 45);
+  text('ALPHA: ' + eeg.alpha, 10, 60);
+  text('BETA:  ' + eeg.beta,  10, 75);
+  text('GAMMA: ' + eeg.gamma, 10, 90);
+
+  text('ACCEL: ' + Math.round(accel.x) + "  " + Math.round(accel.y) + "  " + Math.round(accel.z), 10, 130);
   
   textSize(12);
   text('Target frequency: ' + selectedFrequency + ' Hz', 25, height-18);
@@ -128,12 +137,14 @@ function didReceiveRtcData(data, id) {
 
   console.log("received data", jsonData, id)
 
-  if (jsonData.type == BATTERY_ID) {
+  if (jsonData.type == EEG_ID) {
+    eeg = jsonData
+  } else if (jsonData.type == PPG_ID) {
+    ppg = jsonData
+  } else if (jsonData.type == ACCEL_ID) {
+    accel = jsonData
+  } else if (jsonData.type == BATTERY_ID) {
     batteryLevel = jsonData.batteryLevel + "%"
-  }
-  if (jsonData.type == ACCEL_ID) {
-    accel = jsonData.accel
-    console.log("RX accel", accel);
   }
 
 }

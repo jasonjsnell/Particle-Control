@@ -95,9 +95,14 @@ function didReceiveRtcData(data, id) {
 //muse device listeners
 function didUpdateEeg(){
   //console.log("didUpdateEeg:", eeg);
+  eeg.type = EEG_ID;
+  eeg.spectrum = eegSpectrum;
+  p5lm.send(JSON.stringify(eeg));
 }
 function didUpdatePpg(){
   //console.log("didUpdatePpg:", ppg);
+  ppg.type = PPG_ID;
+  p5lm.send(JSON.stringify(ppg));
 }
 function didUpdateAccel(){
   //console.log("didUpdateAccel:", accel);
