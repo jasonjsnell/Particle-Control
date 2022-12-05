@@ -1,3 +1,10 @@
+import * as THREE from 'three';
+    
+const SPRITE_TOTAL = 1000;
+const SPRITE_SIZE = 2;
+let spherePoints;
+let sphereRadius = 3;
+
 const renderer = new THREE.WebGLRenderer();
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(
@@ -6,86 +13,117 @@ const camera = new THREE.PerspectiveCamera(
     2,
     2000
 );
+const clock = new THREE.Clock();
 
-let spherePoints;
-let sphereVector;
+//remember to move camera otherwise I might be in an object and not see it
+camera.position.z = 300;
 
 //all variables above functions
 init3dSphere();
 
 function init3dSphere(){
 
-    //init global vars
-    sphereVector = new THREE.Vector3();
-
-    //remember to move camera otherwise I might be in an object and not see it
-    camera.position.z = 300;
-
     //full screen
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
-    addLights();
     addObjects();
-    animate(); //starts render loop
+    animate();//starts render loop
 }
 
 //draw loop
 function animate(){
+    
     requestAnimationFrame(animate);//calls self, becomes draw loop
     renderer.render(scene, camera)
-    spherePoints.rotation.x += 0.01;
-    spherePoints.rotation.y += 0.01;
-}
+ 
+    //spinning
+    let time = clock.getElapsedTime();
 
-function randomPointInSphere( radius ) {
+    //slowly rotate points
+    spherePoints.rotation.x -= 0.0005;
+    spherePoints.rotation.y += 0.00125;
+    spherePoints.rotation.z += 0.0033;
+    //camera.position.z = 300 + (Math.sin(time * 0.9) * 10);
+
+    let radiusChange = (Math.sin(time * 0.5) * 0.2);
+
+    //get every position in the geometry
+    const positions = spherePoints.geometry.attributes.position.array; 
     
-    const x = THREE.MathUtils.randFloat( -1, 1 );
-    const y = THREE.MathUtils.randFloat( -1, 1 );
-    const z = THREE.MathUtils.randFloat( -1, 1 );
-    const normalizationFactor = 1 / Math.sqrt( x * x + y * y );
-  
-    sphereVector.x = x * normalizationFactor * THREE.MathUtils.randFloat( 0.1 * radius, 2.0 * radius );
-    sphereVector.y = y * normalizationFactor *  THREE.MathUtils.randFloat( 0.1 * radius, 2.0 * radius );
-    sphereVector.z = z * normalizationFactor * THREE.MathUtils.randFloat( 0.1 * radius, 1.1 * radius );
-  
-    return sphereVector;
-  }
+    //calc curr and next radius
+    let currRadius = sphereRadius
+    let nextRadius = sphereRadius + radiusChange;
 
-  function addObjects(){
+    for (let i = 0; i < (SPRITE_TOTAL * 3); i++) {
 
-    scene.fog = new THREE.FogExp2( 0x000000, 0.001 );
+        //get position
+        let position = positions[i];
 
-    const vertices = [];
+        //remove curr radius
+        position /= currRadius
 
-    for ( let i = 0; i < 1000; i ++ ) {
+        //add in next radius
+        position *= nextRadius
 
-        var vertex = randomPointInSphere( 50 );
-        vertices.push( vertex.x, vertex.y, vertex.z );
-        // const x = THREE.MathUtils.randFloatSpread( 50 );
-        // const y = THREE.MathUtils.randFloatSpread( 50 );
-        // const z = THREE.MathUtils.randFloatSpread( 100 );
-
-        // vertices.push( x, y, z );
-
+        //put new value back into the array
+        positions[i] = position
     }
 
-    //const geometry = new THREE.BufferGeometry();
+    //save next radius for next loop
+    sphereRadius = nextRadius
+
+    //set to true to update screen
+    spherePoints.geometry.attributes.position.needsUpdate = true
+}
+
+
+function addObjects(){
+
+    let vertices = [];
+
+    //1000 sprites x 3 vertices (x, y, z) per points = 3000 positions
+
+    for ( let i = 0; i < SPRITE_TOTAL; i ++ ) {
+
+        var vertex = _randomPointInSphere( sphereRadius ); 
+        vertices.push( vertex.x, vertex.y, vertex.z );
+    }
+
+    //TODO: run limter code on vertices
+
     const geometry = new THREE.SphereGeometry();
+    
     geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
 
     const sprite = new THREE.TextureLoader().load( './assets/disc.png' );
-    //const material = new THREE.PointsMaterial( { color: 0xFF0000 } );
-    const material = new THREE.PointsMaterial( { size: 5, sizeAttenuation: true, map: sprite, alphaTest: 0.5, transparent: true } );
-				
+    const material = new THREE.PointsMaterial( { 
+        size: SPRITE_SIZE, 
+        sizeAttenuation: true, 
+        map: sprite, 
+        alphaTest: 0.4, 
+        transparent: true,
+        blending: THREE.AdditiveBlending //blend mode 
+    } );
+	
+    
     spherePoints = new THREE.Points( geometry, material );
 
     scene.add( spherePoints );
 }
 
-function addLights(){
-    const ambient = new THREE.AmbientLight(0xFFFFFF, 0.3);
-    const pointLight = new THREE.PointLight(0xFFFFFF, 1, 50);
-    pointLight.position.set(0, 2, 1);
-    scene.add(ambient);
-    scene.add(pointLight);
+
+function _randomPointInSphere( radius ) {
+    
+    const x = THREE.MathUtils.randFloat( -1, 1 );
+    const y = THREE.MathUtils.randFloat( -1, 1 );
+    const z = THREE.MathUtils.randFloat( -1, 1 );
+    const normalizationFactor = 1 / Math.sqrt( x * x + y * y );
+    
+    let sphereVector = new THREE.Vector3();
+
+    sphereVector.x = x * normalizationFactor * THREE.MathUtils.randFloat( 0, 2.0 ) * radius;
+    sphereVector.y = y * normalizationFactor *  THREE.MathUtils.randFloat( 0, 2.0 ) * radius;
+    sphereVector.z = z * normalizationFactor * THREE.MathUtils.randFloat( 0, 1.1 ) * radius;
+  
+    return sphereVector;
 }
