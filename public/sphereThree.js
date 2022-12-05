@@ -121,9 +121,32 @@ function _randomPointInSphere( radius ) {
     
     let sphereVector = new THREE.Vector3();
 
+    
     sphereVector.x = x * normalizationFactor * THREE.MathUtils.randFloat( 0, 2.0 ) * radius;
     sphereVector.y = y * normalizationFactor *  THREE.MathUtils.randFloat( 0, 2.0 ) * radius;
     sphereVector.z = z * normalizationFactor * THREE.MathUtils.randFloat( 0, 1.1 ) * radius;
   
+    let limit = 5.5;
+    //console.log(sphereVector.x, sphereVector.y, sphereVector.z)
+    if (sphereVector.x > limit) {
+        sphereVector.x = limit;
+    }
+    if (sphereVector.x < -limit) {
+        sphereVector.x = -limit;
+    }
+    if (sphereVector.y > limit) {
+        sphereVector.y = limit;
+    }
+    if (sphereVector.y < -limit) {
+        sphereVector.y = -limit;
+    }
+    if (sphereVector.z > limit) {
+        sphereVector.z = limit;
+    }
+    if (sphereVector.z < -limit) {
+        sphereVector.z = -limit;
+    }
+
+
     return sphereVector;
 }

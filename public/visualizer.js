@@ -8,7 +8,7 @@ let smoothedFocus = 0;
 
 function setup() {
  
-  createCanvas(400, 400);
+  createCanvas(175, 65);
 
   selectedFrequency = 10;
   selectedAmplitude = 10;
@@ -21,7 +21,7 @@ function setup() {
 }
 
 function draw() {
-  background(220);
+  background(0);
 
   //visual feedback
   let amplitudeOfTargetFrequency = eegSpectrum[selectedFrequency];
@@ -30,10 +30,8 @@ function draw() {
   if (amountAboveTargetAmplitude > 10) { amountAboveTargetAmplitude = 10}
   if (smoothedFocus < amountAboveTargetAmplitude-1) { 
     smoothedFocus += 0.25; 
-    //console.log("up")
   } else if (smoothedFocus > amountAboveTargetAmplitude+1) {
     smoothedFocus -= 0.1;
-    //console.log("down")
   }
 
   let circleAlpha = map(smoothedFocus, 0, 10, 0, 255)
@@ -44,35 +42,13 @@ function draw() {
   fill(circleColor);
   circle(width/2, height/2, circleSize);
 
-  // EEG chart
-  // beginShape();
-  // strokeWeight(1);
-  // noFill();
-  // stroke(255, 255, 255);
-
-  // for (let i = 1; i <= (eegSpectrum.length/2); i++) {
-  //  let x = map(i, 1, eegSpectrum.length/2, 0, width);
-  //  let y = map(eegSpectrum[i], 0, 50, height, 0);
-  //  vertex(x, y); //<-- draw a line graph
-  // }
-  // endShape();
-
-  noStroke();
-  fill(0);
+  fill(255);
   
   textSize(10);
-  text('BATTERY: ' + batteryLevel + "%", width-80, 10);
+  text('BATTERY: ' + batteryLevel + "%", 10, 20);
 
-  // textSize(12);
-  // text('DELTA: ' + eeg.delta, 10, 30);
-  // text('THETA: ' + eeg.theta, 10, 45);
-  // text('ALPHA: ' + eeg.alpha, 10, 60);
-  // text('BETA:  ' + eeg.beta,  10, 75);
-  // text('GAMMA: ' + eeg.gamma, 10, 90);
-  
-  textSize(12);
-  text('Target frequency: ' + selectedFrequency + ' Hz', 25, height-18);
-  text('Amplitude threshold: ' + selectedAmplitude + ' mV', width * 0.5, height-18);
+  text('TARGET FREQUENCY: ' + selectedFrequency + ' Hz', 10, 35);
+  text('AMPLITUDE THRESHOLD: ' + selectedAmplitude + ' mV', 10, 50);
   
 }
 

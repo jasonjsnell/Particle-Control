@@ -1,0 +1,24 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+canvas {
+  display: block;
+  top:0;
+}
+
+main canvas{
+  border:1px solid white;
+  position:absolute;
+  top: 5px;
+  right: 5px;
+  opacity: 0.85;
+  /* visibility: hidden; */
+}
+button {
+  position:absolute;
+  right:5px;
+  top:75px;
+}
