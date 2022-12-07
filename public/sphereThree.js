@@ -10,7 +10,7 @@ let cloudPoints;
 let cloudRadius = 3;
 let newCloudRadius = 100;
 const BRIGHT_DEFAULT = 2.69;
-const GLOW_DEFAULT = 0.83;
+const GLOW_DEFAULT = 0.79;
 const TRAIL_DEFAULT = 0.54
 
 let composer;
